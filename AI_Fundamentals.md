@@ -1,4 +1,8 @@
 # 1
+https://platform.openai.com/home
+
+Get OPENAI_API_KEY
+
 curl -s "$OPENAI_BASE_URL/v1/chat/completions" \
   -H "Authorization: Bearer $OPENAI_API_KEY" \
   -H "Content-Type: application/json" \
@@ -132,7 +136,7 @@ print(reply.content)
 # Langchain example
 
 ```
-mport os
+import os
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 
@@ -150,6 +154,8 @@ import pathlib
 pathlib.Path("/root/langchain-lab").mkdir(exist_ok=True)
 pathlib.Path("/root/langchain-lab/output.txt").write_text(reply.content)
 ```
+
+# What is an agent
 
 
 
