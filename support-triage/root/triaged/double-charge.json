@@ -1,1 +1,4 @@
-{"category": "billing", "priority": "critical"}
+{
+  "category": "billing",
+  "priority": "critical"
+}
