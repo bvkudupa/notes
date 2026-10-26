@@ -129,3 +129,42 @@ jobs:
         run: ls report
         working-directory: report
 ```
+
+![alt text](image-11.png)
+
+Actions can also live in the same repository through a local path, or come from a Docker image. Those forms use different uses: addresses; owner/repository@ref names a remote repository action.
+
+The marketplace
+
+Published actions are listed in the GitHub Marketplace at github.com/marketplace. There are actions for checking out code, setting up language toolchains, sending Slack messages, publishing releases, and much more. Before writing a long run script for a common task, it is normal to check whether a well maintained action already does it.
+
+Anyone can publish an action, so the owner matters. Actions under the actions owner are maintained by GitHub and are the safe default for the basics.
+
+In the next lesson: the one action almost every workflow starts with, and the reason it has to exist.
+
+![alt text](image-12.png)
+
+# Fix:
+```
+steps:
+  - name: Get the code
+    uses: actions/checkout@v4
+  - name: Read the readme
+    run: cat README.md
+```
+
+ex:
+```
+name: Checkout code
+on: 
+  push: 
+jobs: 
+  test: 
+    runs-on: ubuntu-latest
+    steps: 
+      - name: checkout code
+        uses: actions/checkout@v4
+      - name: list files
+        shell: bash
+        run: ls
+```
