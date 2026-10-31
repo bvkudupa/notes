@@ -94,3 +94,124 @@ root@escbash-lab:~/answers# ip neigh
 root@escbash-lab:~/answers# ip neigh > /root/answers/neigh-after.txt
 root@escbash-lab:~/answers# 
 ```
+![alt text](image-15.png)
+
+# Theoretical OSI model Layers: (This is what used for troubleshooting / Teaching)
+
+* Application | All
+* Presentation | People
+* Session | Should
+* Transport | Try
+* Network | New
+* Data link | Dominos
+* Physical  | Pizza
+
+# Practical TCP/IP model: (This is how internet is programmed)
+
+* Link layer
+* Internet layer
+* Transport layer
+* Application layer
+
+```
+mac and arp are assigned to the link layer
+
+ip-address is assigned to the internet layer
+
+tcp and port are assigned to the transport layer
+
+http is assigned to the application layer
+```
+
+![alt text](image-16.png)
+
+![alt text](image-17.png)
+
+![alt text](image-18.png)
+
+![alt text](image-19.png)
+
+![alt text](image-20.png)
+
+![alt text](image-21.png)
+
+```
+getent hosts example.com >/dev/null & ss -upn
+nc -u -l 9000 > /root/udp-received.txt &
+printf 'hello over udp\n' | nc -u -w1 127.0.0.1 9000
+nc -l 9000 > /root/incoming.txt
+nc -N 127.0.0.1 9000 < /root/outgoing.txt
+```
+
+![alt text](image-22.png)
+
+# DNS:
+```
+dig example.com A                    # query IPv4 records
+dig @1.1.1.1 example.com MX          # query a specific DNS server
+dig +short example.com               # show concise results
+dig +trace example.com                # follow DNS delegation
+dig @hera.ns.cloudflare.com example.com A +norecurse
+```
+![alt text](image-23.png)
+
+![alt text](image-24.png)
+
+![alt text](image-25.png)
+
+```
+root@escbash-lab:~# dig www.github.com
+
+; <<>> DiG 9.18.39-0ubuntu0.24.04.7-Ubuntu <<>> www.github.com
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 8657
+;; flags: qr rd ra; QUERY: 1, ANSWER: 2, AUTHORITY: 0, ADDITIONAL: 1
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 1232
+;; QUESTION SECTION:
+;www.github.com.                        IN      A
+
+;; ANSWER SECTION:
+www.github.com.         3564    IN      CNAME   github.com.
+github.com.             24      IN      A       140.82.121.3
+
+;; Query time: 0 msec
+;; SERVER: 1.1.1.1#53(1.1.1.1) (UDP)
+;; WHEN: Sat Oct 31 18:08:47 UTC 2026
+;; MSG SIZE  rcvd: 73
+
+```
+
+![alt text](image-26.png)
+
+![alt text](image-27.png)
+
+# When a resolver is running on local machine with port
+```
+root@escbash-lab:~# dig @127.0.0.1 -p 5353 example.com
+
+; <<>> DiG 9.18.39-0ubuntu0.24.04.7-Ubuntu <<>> @127.0.0.1 -p 5353 example.com
+; (1 server found)
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 30089
+;; flags: qr rd ra; QUERY: 1, ANSWER: 2, AUTHORITY: 0, ADDITIONAL: 1
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 1232
+;; QUESTION SECTION:
+;example.com.                   IN      A
+
+;; ANSWER SECTION:
+example.com.            17      IN      A       104.20.23.154
+example.com.            17      IN      A       172.66.147.243
+
+;; Query time: 0 msec
+;; SERVER: 127.0.0.1#5353(127.0.0.1) (UDP)
+;; WHEN: Sat Oct 31 18:37:04 UTC 2026
+;; MSG SIZE  rcvd: 72
+
+root@escbash-lab:~# 
+```
