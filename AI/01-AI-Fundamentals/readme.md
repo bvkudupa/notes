@@ -1,163 +1,147 @@
-# 1
-https://platform.openai.com/home
+# AI Fundamentals
 
-Get OPENAI_API_KEY
+This folder introduces the building blocks behind LLM applications: model
+requests, prompts, chains, tools, and agents. Read the sections in order, then
+follow the links into each small project to see those ideas applied to files.
 
-curl -s "$OPENAI_BASE_URL/v1/chat/completions" \
-  -H "Authorization: Bearer $OPENAI_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"model": "minimax-m3", "messages": [
-    {"role": "user", "content": "What is a good tool for formatting JSON on the command line?"},
+## Learning path
+
+| Step | Topic | Example |
+| --- | --- | --- |
+| 1 | Send a chat request and understand message history | [Chat completions](#1-send-a-chat-request) |
+| 2 | Turn a prompt and a model into a reusable chain | [`llm_chain.py`](./llm_chain.py) |
+| 3 | Let an agent choose and call a tool | [`llm_agent.py`](./llm_agent.py) |
+| 4 | Apply an agent to a document, a log, and support tickets | [Hands-on projects](#4-hands-on-projects) |
+
+## Before you start
+
+The Python examples use LangChain and an OpenAI-compatible chat API. From this
+folder, install the packages and provide credentials in your environment or a
+`.env` file:
+
+```bash
+python3 -m pip install langchain langchain-openai python-dotenv
+export OPENAI_API_KEY="your-api-key"
+```
+
+`OPENAI_BASE_URL` is optional when using OpenAI directly. For a compatible
+provider, set it to that provider's API base URL; the Python examples append
+`/v1` when needed. Keep credentials out of source files and commits.
+
+## 1. Send a chat request
+
+A chat request is a sequence of messages with roles such as `user` and
+`assistant`. Sending earlier messages along with the latest question gives the
+model context from the conversation. The JSON body of a chat-completions
+request can look like this:
+
+```json
+{
+  "model": "your-model-name",
+  "messages": [
+    {"role": "user", "content": "What is a good tool for formatting JSON?"},
     {"role": "assistant", "content": "jq is a great choice."},
     {"role": "user", "content": "Give me the install command for it."}
-  ]}' \
-  | jq -r '.choices[0].message.content'
-
-Model	Rough character	Reach for it when
-deepseek-v4-flash	Fast, cheap, general	You want a quick, solid answer to an everyday request
-deepseek-v4-pro	Deeper reasoning, slower	The problem has several steps or needs careful thinking
-glm-5.2	Strong all-rounder	You want a capable general model and aren't sure which to pick
-gpt-oss-120b	Large open model	You want extra capacity from a big model and can wait a little
-minimax-m3	Quick and concise	You want short, to-the-point replies at speed
-
-# 2
-mkdir -p /root/tools
-curl -s "$OPENAI_BASE_URL/v1/chat/completions" \
-  -H "Authorization: Bearer $OPENAI_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"model": "deepseek-v4-pro", "messages": [{"role": "user", "content": "What is the weather in Paris right now?"}],
-    "tools": [{"type": "function", "function": {
-      "name": "get_weather",
-      "description": "Get the current weather for a city",
-      "parameters": {"type": "object", "properties": {"city": {"type": "string"}}, "required": ["city"]}
-    }}]}' > /root/tools/weather-call.json
-
-# 3 Setup Github MCP server
-echo "GITHUB_PERSONAL_ACCESS_TOKEN=ghp_your_token_here" >> /root/.env
-source /root/.env
-export GITHUB_PERSONAL_ACCESS_TOKEN
-
-claude mcp add github -e GITHUB_PERSONAL_ACCESS_TOKEN=$GITHUB_PERSONAL_ACCESS_TOKEN -- npx -y @modelcontextprotocol/server-github
-claude mcp list
-
-node.js is the backend for running the Java script
-
-node somejavascript.js to run the JS
-
-npm install downlaods, npx it downloads to cache and runs it.. (it downloads from npm registry)
-
-
-# 4 Run below command on fresh server
-pip3 install --break-system-packages --ignore-installed openai anthropic
-python3 -c "import openai, anthropic; print('ready')"
-
-
-# 5 Py
-
-# cat ask.py 
-import sys
-import openai
-
-client = openai.OpenAI()
-
-reply = client.chat.completions.create(
-    model="deepseek-v4-flash",
-    messages=[{"role": "user", "content": sys.argv[1]}],
-)
-print(reply.choices[0].message.content)
-# cat ask_claude_style.py 
-import anthropic
-
-client = anthropic.Anthropic()
-
-reply = client.messages.create(
-    model="minimax-m3",
-    max_tokens=2000,
-    messages=[{"role": "user", "content": "What is a container, in two sentences?"}],
-)
-print(reply.content[0].text)
-
-# 6
-
-import glob, os, openai
-
-client = openai.OpenAI()
-os.makedirs("/root/summaries", exist_ok=True)
-
-for path in glob.glob("/root/inbox/*.txt"):
-    text = open(path).read()
-    reply = client.chat.completions.create(
-        model="deepseek-v4-flash",
-        messages=[{"role": "user", "content": f"Summarize this in a sentence:\n\n{text}"}],
-    )
-    out = "/root/summaries/" + os.path.basename(path)
-    open(out, "w").write(reply.choices[0].message.content)
-
-# 7
-Three jobs show up in almost every LLM app, and LangChain gives each one a reusable piece:
-
-- The API call. A chat model object talks to the API for you. You call it like a function and get the reply text back, instead of hand-building JSON and parsing it.
-- The prompt. A prompt template is a string with holes in it. You write the wording once with a variable like {topic}, then fill the hole with a real value each time. No more gluing strings together.
-- The chaining. You pipe the template into the model so the filled-in prompt flows straight into the call as one unit. That combined unit is a "chain", which is where the name comes from.
-
-# Chat model
-LangChain's OpenAI-compatible model lives in the langchain-openai package and is called ChatOpenAI. It reads the same two environment variables you've been using all along - OPENAI_BASE_URL for the API URL and OPENAI_API_KEY for the key - so you don't paste either into your code. You only pick which model answers:
-```
-from langchain_openai import ChatOpenAI
-
-model = ChatOpenAI(model="gpt-oss-120b")
+  ]
+}
 ```
 
-# Top free LLM
-- deepseek-v4-flash
-- deepseek-v4-pro
-- glm-5.2
-- gpt-oss-120b
-- minimax-m3
+Send this body to your provider's `/v1/chat/completions` endpoint using its
+documented authentication method. Replace `your-model-name` with a model
+available from your provider. The important part is the `messages` array: the
+model receives the conversation history, not just the final question.
 
-# The prompt template
+## 2. Build a chain from a prompt and a model
 
-```
-from langchain_core.prompts import ChatPromptTemplate
+A chain connects reusable steps. In this example, a prompt template provides
+the `{topic}` variable and the model generates the response. The `|` operator
+passes the formatted prompt to the model.
 
-prompt = ChatPromptTemplate.from_template(
-    "Explain what is {topic} in two sentences"
-)
-```
+Run the complete example from this folder:
 
-# Piping them into a chain
-The | operator joins the pieces so the filled-in prompt flows into the model as one unit. Call .invoke() with the variables and read the reply off the result:
-
-```chain = prompt | model
-reply = chain.invoke({"topic": "DNS"})
-print(reply.content)
+```bash
+python llm_chain.py
 ```
 
-# Langchain example
+Open [`llm_chain.py`](./llm_chain.py) to see how it:
 
-```
-import os
-from langchain_openai import ChatOpenAI
-from langchain_core.prompts import ChatPromptTemplate
+- Loads configuration from the environment and `.env`.
+- Creates a `ChatOpenAI` model.
+- Defines a `ChatPromptTemplate` and pipes it into the model.
+- Invokes the chain with a topic and prints the response.
 
-model = ChatOpenAI(
-    model="glm-5.2",
-    base_url=os.environ["OPENAI_BASE_URL"] + "/v1",
-    api_key=os.environ["OPENAI_API_KEY"],
-)
-prompt = ChatPromptTemplate.from_template("Explain {topic} in two sentences.")
-chain = prompt | model
+## 3. Give an agent a tool
 
-reply = chain.invoke({"topic": "how DNS resolves a domain name"})
+A chain follows the steps you connect. An agent can decide whether to use one
+of its available tools to answer a request. In
+[`llm_agent.py`](./llm_agent.py), the `multiply` tool performs arithmetic and
+the agent is asked a multiplication question.
 
-import pathlib
-pathlib.Path("/root/langchain-lab").mkdir(exist_ok=True)
-pathlib.Path("/root/langchain-lab/output.txt").write_text(reply.content)
+```bash
+python llm_agent.py
 ```
 
-# What is an agent
+Compare this file with [`llm_chain.py`](./llm_chain.py): the chain always runs
+the prompt through the model, while the agent can choose to call the tool.
 
+## 4. Hands-on projects
 
+Each project puts an agent in front of a small, local set of files. Run
+commands from this folder so the examples can find their project assets.
 
+### Ask questions about a runbook
 
+[`projects/runbook/ask_doc.py`](./projects/runbook/ask_doc.py) defines a
+document-reading tool and instructs the agent to answer using the runbook.
+The source document is
+[`projects/runbook/runbook.md`](./projects/runbook/runbook.md), and both files
+are in the [`projects/runbook/` folder](./projects/runbook/).
 
+```bash
+python projects/runbook/ask_doc.py "Who owns the reports API?"
+```
+
+### Explain a log
+
+[`projects/log-explain/main.py`](./projects/log-explain/main.py) accepts a
+question and an optional log-file path. It reads the selected log through a
+tool and asks the model to answer from the log evidence. The included sample is
+[`projects/log-explain/sample.log`](./projects/log-explain/sample.log); browse
+the [`projects/log-explain/ folder`](./projects/log-explain/).
+
+```bash
+python projects/log-explain/main.py "Why did the request fail?"
+python projects/log-explain/main.py --log-file /path/to/other.log "What happened?"
+```
+
+### Triage support tickets
+
+[`projects/support-triage/main.py`](./projects/support-triage/main.py) lists
+and reads every `.txt` ticket, then writes a JSON classification for each one.
+The example inputs are in
+[`projects/support-triage/root/tickets/`](./projects/support-triage/root/tickets/):
+
+- [`reset-password.txt`](./projects/support-triage/root/tickets/reset-password.txt)
+- [`double-charge.txt`](./projects/support-triage/root/tickets/double-charge.txt)
+
+The corresponding example results are in
+[`projects/support-triage/root/triaged/`](./projects/support-triage/root/triaged/):
+
+- [`reset-password.json`](./projects/support-triage/root/triaged/reset-password.json)
+- [`double-charge.json`](./projects/support-triage/root/triaged/double-charge.json)
+
+Run the classifier from this folder:
+
+```bash
+python projects/support-triage/main.py
+```
+
+The command writes or overwrites the matching JSON files in `root/triaged/`.
+Use `--tickets-dir` and `--output-dir` to choose different input and output
+folders.
+
+## Where to go next
+
+Continue to [02-RAG](../02-RAG/readme.md) to explore retrieval-augmented
+generation, or browse [03-FDE](../03-FDE/readme.md) for the next topic in this
+AI learning series.

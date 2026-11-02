@@ -80,3 +80,7 @@ vec_a = response.data[0].embedding
 vec_b = response.data[1].embedding
 print(round(cosine(vec_a, vec_b), 3))
 ```
+
+# Semantic search:
+
+![alt text](image-2.png)
