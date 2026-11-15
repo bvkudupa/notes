@@ -129,12 +129,52 @@ for item in scored:
 
 ![alt text](image-4.png)
 
-# DHCP
+# Chunking:
 
-![alt text](image-5.png)
+![alt text](image-9.png)
 
-![alt text](image-6.png)
+![alt text](image-10.png)
 
-![alt text](image-7.png)
+# Chunking:
+![alt text](image-11.png)
 
-![alt text](image-8.png)
+* Chunking document at every paragraph:
+
+```
+text = open("runbook.txt").read()
+
+chunks = [p.strip() for p in text.split("\n\n") if p.strip()]
+
+for i, chunk in enumerate(chunks):
+    print(f"--- chunk {i} ({len(chunk)} chars)")
+    print(chunk)
+```
+
+# Embedding the chunks
+
+```
+import json
+import os
+from openai import OpenAI
+
+client = OpenAI(
+    base_url=os.environ["OPENAI_BASE_URL"],
+    api_key=os.environ["OPENAI_API_KEY"],
+)
+
+chunks = json.load(open("chunks.json"))
+
+response = client.embeddings.create(
+    model="text-embedding-3-small",
+    input=chunks,
+)
+
+index = []
+for chunk, data in zip(chunks, response.data):
+    index.append({"text": chunk, "embedding": data.embedding})
+
+json.dump(index, open("index.json", "w"))
+print(f"indexed {len(index)} chunks")
+```
+
+![alt text](image-12.png)
