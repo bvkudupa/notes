@@ -9,3 +9,4 @@ These notes are grouped into a few guides so you can browse by topic:
 - [DNS](dns/readme.md) — DNS records, lookups, caching, authoritative answers, and dnsmasq.
 - [HTTP and Nginx](http-and-nginx/readme.md) — HTTP requests, curl, cookies, status codes, and virtual hosts.
 - [TLS and certificates](tls-and-certificates/readme.md) — TLS connections, certificates, CSRs, and private certificate authorities.
+- [Firewalls](firewall/readme.md) — `iptables` chains, rule matching and order, and firewall practice.
