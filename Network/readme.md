@@ -34,7 +34,7 @@ Follow the lessons in order to build up from basic network concepts to practical
 22. **Firewall basics** — [Packet paths and chains](firewall/readme.md#packet-paths-and-chains)
 23. **Firewall practice** — [Firewall practice walkthroughs](firewall/readme.md#practice-walkthroughs)
 24. **tcpdump** — [Capture and filter packets](tcpdump/readme.md)
-25. **SSH and tunnels** — Notes coming soon
+25. **SSH and tunnels** — [Local and remote port forwarding](ssh-and-tunnels/readme.md)
 26. **Reverse proxy and load balancing** — [Nginx server blocks](http-and-nginx/readme.md#nginx-server-blocks) (reverse proxy notes coming soon)
 27. **Scanning with nmap** — Notes coming soon
 28. **The debugging playbook** — Start with [layer-specific diagnostic tools](transport-and-sockets/readme.md#network-layers), then follow the [route decision](addressing-and-routing/readme.md#default-gateway-and-route-selection) and inspect packets with [tcpdump](tcpdump/readme.md)
@@ -46,4 +46,4 @@ Follow the lessons in order to build up from basic network concepts to practical
 - **Local delivery:** [IP addresses](addressing-and-routing/readme.md#ipv4) are assigned to [interfaces](addressing-and-routing/readme.md#interfaces-and-addresses); [subnets](addressing-and-routing/readme.md#subnets-and-cidr) tell you which destinations are local, and [ARP](addressing-and-routing/readme.md#mac-addresses-arp-and-the-neighbor-table) finds the local MAC address.
 - **Getting to a service:** the [route and gateway](addressing-and-routing/readme.md#default-gateway-and-route-selection) select the path; [ports and sockets](transport-and-sockets/readme.md#tcp-and-udp-sockets) identify the destination service; [TCP](transport-and-sockets/readme.md#tcp-connection-setup-reliability-and-close) or [UDP](transport-and-sockets/readme.md#tcp-and-udp-sockets) carries the traffic.
 - **Using a website:** [DNS](dns/readme.md) finds an address, [HTTP and Nginx](http-and-nginx/readme.md) exchange web requests, and [TLS](tls-and-certificates/readme.md) protects HTTPS connections.
-- **Operating and debugging:** [DHCP](dhcp/readme.md) provides network configuration, [NAT](nat/readme.md) translates addresses, [firewall rules](firewall/readme.md) filter packets, and [tcpdump](tcpdump/readme.md) lets you observe what actually happened.
+- **Operating and debugging:** [DHCP](dhcp/readme.md) provides network configuration, [NAT](nat/readme.md) translates addresses, [firewall rules](firewall/readme.md) filter packets, [SSH tunnels](ssh-and-tunnels/readme.md) carry selected TCP traffic through an encrypted connection, and [tcpdump](tcpdump/readme.md) lets you observe what actually happened.
