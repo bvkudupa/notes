@@ -98,3 +98,82 @@ The names do not need to exist in DNS to test name-based virtual hosting locally
 curl -H 'Host: site-a.test' http://127.0.0.1:8080/
 curl -H 'Host: site-b.test' http://127.0.0.1:8080/
 ```
+
+## Reverse proxy and load balancing
+
+A reverse proxy accepts client requests and forwards them to one or more backend servers. The client connects to the proxy rather than directly to a backend, so the proxy can provide a common entry point, hide backend addresses, and distribute traffic.
+
+![Reverse proxy request flow](screenshots/reverse-proxy-request-flow.png)
+
+![A proxy forwards requests to a backend](screenshots/reverse-proxy-backend.png)
+
+Start with a backend listening on port `8001`:
+
+```bash
+curl http://127.0.0.1:8001
+# backend-1
+```
+
+An Nginx server block on port `8080` can forward all matching requests to that backend:
+
+```nginx
+server {
+    listen 8080;
+
+    location / {
+        proxy_pass http://127.0.0.1:8001;
+    }
+}
+```
+
+Test the configuration, reload Nginx, and verify the proxy:
+
+```bash
+nginx -t
+systemctl reload nginx
+curl http://127.0.0.1:8080
+# backend-1
+```
+
+A direct request and a proxied request reach the same application, but the client address seen at the backend may differ because Nginx opens the upstream connection.
+
+### Upstreams
+
+For load balancing, define named upstream servers and use the upstream name as the `proxy_pass` target:
+
+![Upstream server pool](screenshots/upstream-server-pool.png)
+
+![Load balancing across backend servers](screenshots/load-balancing-backends.png)
+
+```nginx
+upstream backend_pool {
+    server 127.0.0.1:8001;
+    server 127.0.0.1:8002;
+}
+
+server {
+    listen 8080;
+
+    location / {
+        proxy_pass http://backend_pool;
+    }
+}
+```
+
+With no additional load-balancing directive, Nginx distributes requests across the servers using a round-robin policy. Nginx also supports weighting servers according to their capacity:
+
+```nginx
+upstream backend_pool {
+    server 127.0.0.1:8001 weight=3;
+    server 127.0.0.1:8002 weight=1;
+}
+```
+
+If a backend is not available, remove it temporarily with `down` during maintenance:
+
+```nginx
+upstream backend_pool {
+    server 127.0.0.1:8001;
+    server 127.0.0.1:8002 down;
+}
+```

@@ -35,7 +35,7 @@ Follow the lessons in order to build up from basic network concepts to practical
 23. **Firewall practice** — [Firewall practice walkthroughs](firewall/readme.md#practice-walkthroughs)
 24. **tcpdump** — [Capture and filter packets](tcpdump/readme.md)
 25. **SSH and tunnels** — [Local and remote port forwarding](ssh-and-tunnels/readme.md)
-26. **Reverse proxy and load balancing** — [Nginx server blocks](http-and-nginx/readme.md#nginx-server-blocks) (reverse proxy notes coming soon)
+26. **Reverse proxy and load balancing** — [Reverse proxy and load balancing](http-and-nginx/readme.md#reverse-proxy-and-load-balancing)
 27. **Scanning with nmap** — Notes coming soon
 28. **The debugging playbook** — Start with [layer-specific diagnostic tools](transport-and-sockets/readme.md#network-layers), then follow the [route decision](addressing-and-routing/readme.md#default-gateway-and-route-selection) and inspect packets with [tcpdump](tcpdump/readme.md)
 29. **Latency and bandwidth** — Notes coming soon
