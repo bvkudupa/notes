@@ -2,6 +2,20 @@
 
 This guide covers how addresses identify machines and interfaces, how subnet masks divide networks, and how the kernel decides where to send packets.
 
+## What is a network
+
+A network connects computers and network devices so they can exchange packets. Hosts identify themselves with addresses, switch traffic within a local network, and use routers to reach destinations outside that local network.
+
+A small network typically includes:
+
+- **Hosts** — computers, phones, servers, containers, or virtual machines
+- **Interfaces** — the OS objects through which a host sends and receives network traffic
+- **Switches** — devices that forward Ethernet frames within a local network
+- **Routers** — devices that forward IP packets between networks
+- **Protocols** — agreed message formats and rules, such as Ethernet, IP, TCP, UDP, DNS, and HTTP
+
+A packet is a unit of network data. A complete troubleshooting run follows the path from the application, through its transport protocol and address, across routes and links, to the remote application and back.
+
 ## IPv4
 
 Each IPv4 address is 32 bits, written as four groups of 8 bits (called octets). The dots are just a readable way to separate those groups.

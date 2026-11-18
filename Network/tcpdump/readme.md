@@ -67,3 +67,26 @@ For example, if a request is never seen on the right interface, the issue is oft
 ![Packet details and protocol information](screenshots/image-3.png)
 
 ![Capture summary with packet metadata](screenshots/image-4.png)
+
+## Scanning with nmap
+
+Nmap discovers hosts and identifies which ports are open on them. Scan the loopback host to test nmap locally:
+
+```bash
+nmap 127.0.0.1
+nmap -p 8000 127.0.0.1
+```
+
+The port state distinguishes what nmap learned:
+
+- `open` — a service accepted the probe
+- `closed` — the host replied but no service is listening
+- `filtered` — a firewall or network device likely blocked the probe
+
+Use service detection to ask nmap to identify software and versions instead of merely guessing from port numbers:
+
+```bash
+nmap -sV 127.0.0.1
+```
+
+Start with local or explicitly authorized targets. Nmap sends probes and can affect availability monitoring or logs, so do not scan systems without permission.

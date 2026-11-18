@@ -42,6 +42,23 @@ curl -s -L -D /root/headers/redirect-headers.txt \
 
 ![Reading curl verbose output](screenshots/image-32.png)
 
+## JSON responses
+
+Many HTTP APIs return JSON. Use curl to fetch the response body and save it for inspection:
+
+```bash
+curl -s http://127.0.0.1:8080/api/status \
+  > /root/headers/status.json
+```
+
+The `jq` utility parses JSON and can extract a field:
+
+```bash
+jq '.status' /root/headers/status.json
+```
+
+HTTP status and JSON content are separate checks. A `200 OK` response can contain an application-level error, while a `4xx` or `5xx` response can still include a JSON error object. Inspect both the status code and response body when debugging APIs.
+
 ## Cookies
 
 HTTP is stateless: cookies let a server associate later requests with earlier ones. The server sends `Set-Cookie`; the client returns a `Cookie` header on later requests.

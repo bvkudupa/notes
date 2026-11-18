@@ -1,10 +1,10 @@
 # Network learning path
 
-Follow the lessons in order to build up from basic network concepts to practical troubleshooting. A lesson links to the relevant section of the notes; **Notes coming soon** marks a topic that does not have a guide yet.
+Follow the 30 lessons in order to build up from basic network concepts to practical troubleshooting. The notes are stored in topic folders for convenient grouping, while this page keeps the curriculum titles and exact learning sequence from the course.
 
 ## 1. Foundations
 
-1. **What is a network** — [Network layers and the TCP/IP model](transport-and-sockets/readme.md#network-layers)
+1. **What is a network** — [What is a network](addressing-and-routing/readme.md#what-is-a-network)
 2. **IP addresses** — [IPv4 and IPv6](addressing-and-routing/readme.md#ipv4)
 3. **Interfaces** — [Interfaces and addresses](addressing-and-routing/readme.md#interfaces-and-addresses)
 4. **Subnets and CIDR** — [Subnets and CIDR](addressing-and-routing/readme.md#subnets-and-cidr)
@@ -13,15 +13,15 @@ Follow the lessons in order to build up from basic network concepts to practical
 
 ## 2. Transport and application protocols
 
-7. **Ports and sockets** — [TCP and UDP sockets](transport-and-sockets/readme.md#tcp-and-udp-sockets)
-8. **TCP** — [TCP connection setup, reliability, and close](transport-and-sockets/readme.md#tcp-connection-setup-reliability-and-close)
-9. **UDP** — [TCP and UDP sockets](transport-and-sockets/readme.md#tcp-and-udp-sockets)
-10. **Netcat** — [Testing TCP and UDP with netcat](transport-and-sockets/readme.md#tcp-and-udp-sockets)
+7. **Ports and sockets** — [Ports and sockets](transport-and-sockets/readme.md#ports-and-sockets)
+8. **TCP** — [TCP](transport-and-sockets/readme.md#tcp)
+9. **UDP** — [UDP](transport-and-sockets/readme.md#udp)
+10. **Netcat** — [Netcat](transport-and-sockets/readme.md#netcat)
 11. **DNS basics** — [Querying DNS](dns/readme.md#querying-dns)
 12. **DNS record types** — [Record types](dns/readme.md#record-types)
 13. **Run your own DNS** — [dnsmasq as a local resolver](dns/readme.md#dnsmasq-as-a-local-resolver)
 14. **HTTP** — [HTTP requests and status codes](http-and-nginx/readme.md#http-requests-and-status-codes)
-15. **HTTP headers, redirects, and JSON** — [Inspecting headers and following redirects](http-and-nginx/readme.md#http-requests-and-status-codes) (JSON notes coming soon)
+15. **HTTP headers, redirects, and JSON** — [Headers and redirects](http-and-nginx/readme.md#http-requests-and-status-codes), [Cookies](http-and-nginx/readme.md#cookies), and [JSON responses](http-and-nginx/readme.md#json-responses)
 16. **Serve a website with Nginx** — [Nginx server blocks](http-and-nginx/readme.md#nginx-server-blocks)
 17. **TLS and HTTPS** — [TLS connection flow](tls-and-certificates/readme.md#tls-connection-flow)
 18. **Make your own certificates** — [Create a root CA and issue a site certificate](tls-and-certificates/readme.md#create-a-root-ca-and-issue-a-site-certificate)
@@ -33,13 +33,13 @@ Follow the lessons in order to build up from basic network concepts to practical
 21. **DHCP** — [DHCP and the DORA exchange](dhcp/readme.md#the-dora-exchange)
 22. **Firewall basics** — [Packet paths and chains](firewall/readme.md#packet-paths-and-chains)
 23. **Firewall practice** — [Firewall practice walkthroughs](firewall/readme.md#practice-walkthroughs)
-24. **tcpdump** — [Capture and filter packets](tcpdump/readme.md)
+24. **tcpdump** — [Capture and filter packets](tcpdump/readme.md#basic-packet-capture)
 25. **SSH and tunnels** — [Local and remote port forwarding](ssh-and-tunnels/readme.md)
 26. **Reverse proxy and load balancing** — [Reverse proxy and load balancing](http-and-nginx/readme.md#reverse-proxy-and-load-balancing)
-27. **Scanning with nmap** — Notes coming soon
-28. **The debugging playbook** — Start with [layer-specific diagnostic tools](transport-and-sockets/readme.md#network-layers), then follow the [route decision](addressing-and-routing/readme.md#default-gateway-and-route-selection) and inspect packets with [tcpdump](tcpdump/readme.md)
-29. **Latency and bandwidth** — Notes coming soon
-30. **Project: fix the broken server** — Project notes coming soon
+27. **Scanning with nmap** — [Scanning with nmap](tcpdump/readme.md#scanning-with-nmap)
+28. **The debugging playbook** — [The debugging ladder](transport-and-sockets/readme.md#the-debugging-ladder), starting with [layer-specific diagnostic tools](transport-and-sockets/readme.md#network-layers), then checking the [route decision](addressing-and-routing/readme.md#default-gateway-and-route-selection) and packets with [tcpdump](tcpdump/readme.md)
+29. **Latency and bandwidth** — [Latency and bandwidth](transport-and-sockets/readme.md#latency-and-bandwidth), with [simulated network impairment](transport-and-sockets/readme.md#simulating-a-bad-network) and [MTU](transport-and-sockets/readme.md#mtu)
+30. **Project: fix the broken server** — [Fix the broken server project](transport-and-sockets/readme.md#project-fix-the-broken-server)
 
 ## How the lessons connect
 
