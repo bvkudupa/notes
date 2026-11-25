@@ -1,9 +1,10 @@
 # Retrieval-augmented generation (RAG)
 
-Follow these nine lessons in order to build a simple RAG workflow, from the
-problem it solves to storing and querying your own vectors. Lesson folders
-keep the supporting code, data, and screenshots together; this is the
-chapter's single README and learning path.
+Follow these ten lessons in order to build a simple RAG workflow, from the
+problem it solves to a complete pipeline that retrieves evidence and
+generates a grounded answer. Lesson folders keep the supporting code, data,
+and screenshots together; this is the chapter's single README and learning
+path.
 
 ## Learning path
 
@@ -17,7 +18,8 @@ chapter's single README and learning path.
 | 6 | [Semantic Search](#6-semantic-search) | [`rank-support-messages.py`](./06-semantic-search/rank-support-messages.py) |
 | 7 | [Chunking](#7-chunking) | [`create_chunk.py`](./07-chunking/create_chunk.py), [`data.txt`](./07-chunking/data.txt), [`chunks.json`](./07-chunking/chunks.json) |
 | 8 | [Build Your Own Vector Store](#8-build-your-own-vector-store) | [`create_store.py`](./08-build-your-own-vector-store/create_store.py), [`query_store.py`](./08-build-your-own-vector-store/query_store.py), [query task](#query-the-store), [quick check](#quick-check-your-vector-store) |
-| 9 | [Chroma: A Real Vector Database](#9-chroma-a-real-vector-database) | [`rough_notes.md`](./09-chroma-a-real-vector-database/rough_notes.md), [`add_chunks_chroma.py`](./09-chroma-a-real-vector-database/add_chunks_chroma.py), [`query_your_collection.py`](./09-chroma-a-real-vector-database/query_your_collection.py) |
+| 9 | [Chroma: A Real Vector Database](#9-chroma-a-real-vector-database) | [`add_chunks_chroma.py`](./09-chroma-a-real-vector-database/add_chunks_chroma.py), [`query_your_collection.py`](./09-chroma-a-real-vector-database/query_your_collection.py) |
+| 10 | [The Full RAG Pipeline](#10-the-full-rag-pipeline) | [`full-rag-pipeline.py`](<./10-The Full RAG pipeline/full-rag-pipeline.py>) |
 
 ## Before you start
 
@@ -340,8 +342,66 @@ not be compared as if they were the same scale.
 
 ![Query results and reading Chroma distances](./09-chroma-a-real-vector-database/screenshots/query-chroma-results.png)
 
+## 10. The Full RAG Pipeline
 
+The earlier lessons built each RAG component separately. This final lesson
+connects them into one small application. A complete pipeline has three
+phases:
+
+1. **Index** — split the source material into chunks, embed them, and keep each
+   chunk with its vector. This is normally done once when documents are added
+   or changed.
+2. **Retrieve** — embed the incoming question and find the chunk with the
+   highest cosine similarity. This runs for each question. The included
+   in-memory example recreates its small index at startup; a production
+   application would load a persisted index or vector database, as in Step 9.
+3. **Generate** — give the question and retrieved chunk to the chat model
+   with instructions to answer only from that evidence and to say when the
+   evidence does not contain the answer.
+
+![The three RAG phases together](<./10-The Full RAG pipeline/screenshots/three-phases-together.png>)
+
+The retriever always returns its closest available chunk—even if that chunk
+isn't actually relevant. The grounding instructions are therefore important:
+they tell the model to refuse when the retrieved chunk does not answer the
+question, rather than filling the gap with general knowledge.
+
+![Why grounding rules matter in the pipeline](<./10-The Full RAG pipeline/screenshots/why-grounding-rules-matter.png>)
+
+The runnable
+[`full-rag-pipeline.py`](<./10-The Full RAG pipeline/full-rag-pipeline.py>)
+shows the full sequence. It embeds a four-document engineering handbook,
+retrieves the best match for each question with a cosine-similarity loop, and
+sends the retrieved evidence and question to the model. The same selection
+can be written compactly using `max()`:
+
+```python
+best_chunk = max(
+    zip(chunks, vectors),
+    key=lambda pair: cosine_similarity(query_vector, pair[1]),
+)[0]
 ```
-0.554 Deploys to production happen every Tuesday at 4pm.
-0.301 The staging environment resets nightly at midnight.
+
+![Building your own end-to-end pipeline](<./10-The Full RAG pipeline/screenshots/build-your-own-pipeline.png>)
+![Selecting the highest-scoring chunk](<./10-The Full RAG pipeline/screenshots/retrieval-selects-the-best-match.png>)
+
+### Try the pipeline
+
+From the repository root, run:
+
+```bash
+python "AI/02-RAG/10-The Full RAG pipeline/full-rag-pipeline.py"
 ```
+
+The example asks two questions:
+
+- **Answerable:** "Where do the release notes get published?"
+- **Not answerable from the handbook:** "What is the wifi password in the
+  office?"
+
+The script saves the first retrieved chunk and both generated answers in the
+lesson's ignored `outputs/` folder. Check that the first answer uses the
+team-wiki evidence and the second says the document does not contain the
+requested information.
+
+![A wrong retrieved chunk should lead to an honest refusal](<./10-The Full RAG pipeline/screenshots/wrong-chunk-honest-refusal.png>)

@@ -12,9 +12,12 @@ material does not establish them.
 
 ## Workflow
 
-1. Identify the chapter root, its single README, and all `rough_notes.md`
-   files. Read every rough note completely. Inspect every related script,
-   data file, screenshot, and existing lesson folder before editing.
+1. Identify the chapter root, its root-level `readme.md` (or existing README
+   casing), and all `rough_notes.md` files. The single chapter README must
+   stay directly inside the chapter root, beside the numbered lesson
+   directories, never inside a lesson directory. Read every rough note
+   completely. Inspect every related script, data file, screenshot, and
+   existing lesson folder before editing.
 2. Infer the topic and sequence from the notes and assets. If an essential
    topic detail or screenshot is genuinely missing or ambiguous, ask one
    focused question using the ask-user tool. Otherwise proceed without asking
@@ -28,11 +31,11 @@ material does not establish them.
    Markdown reference. Do not rename screenshots with established,
    meaningful names without a reason.
 5. Integrate all useful teaching content from the rough notes into the
-   chapter README: lesson title and learning-path entry, explanations,
+   chapter-root README: lesson title and learning-path entry, explanations,
    commands, relevant code examples or links to runnable scripts, and
    screenshots. Preserve technical meaning, correct inaccurate explanations
    when facts can be verified, and use relative links consistent with the
-   chapter.
+   chapter. Do not create a per-lesson README unless explicitly requested.
 6. Make moved scripts work from the documented command location and avoid
    machine-specific absolute paths. Preserve existing behavior and unrelated
    work. Do not move, overwrite, or delete generated databases or other local
@@ -49,7 +52,8 @@ material does not establish them.
 
 ## Constraints
 
-- Keep one chapter README unless the chapter already uses another convention.
+- Keep exactly one chapter README at the chapter root unless the user
+  explicitly requests a different structure.
 - Make changes surgical and consistent with neighboring lessons.
 - Do not silently drop rough-note content; link or incorporate it.
 - Do not commit unless explicitly asked.
