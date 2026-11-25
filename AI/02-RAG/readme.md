@@ -16,7 +16,7 @@ single README and learning path.
 | 5 | [Measuring Similarity](#5-measuring-similarity) | [`score-pairs.py`](./05-measuring-similarity/score-pairs.py) |
 | 6 | [Semantic Search](#6-semantic-search) | [`rank-support-messages.py`](./06-semantic-search/rank-support-messages.py) |
 | 7 | [Chunking](#7-chunking) | [`create_chunk.py`](./07-chunking/create_chunk.py), [`data.txt`](./07-chunking/data.txt), [`chunks.json`](./07-chunking/chunks.json) |
-| 8 | [Build Your Own Vector Store](#8-build-your-own-vector-store) | [`create_store.py`](./08-build-your-own-vector-store/create_store.py) |
+| 8 | [Build Your Own Vector Store](#8-build-your-own-vector-store) | [`create_store.py`](./08-build-your-own-vector-store/create_store.py), [`query_store.py`](./08-build-your-own-vector-store/query_store.py), [query task](#query-the-store), [quick check](#quick-check-your-vector-store) |
 
 ## Before you start
 
@@ -175,6 +175,24 @@ The sample screenshots walk through building and querying the store:
 ![Vector store visual](./08-build-your-own-vector-store/screenshots/image-15.png)
 ![Vector store visual](./08-build-your-own-vector-store/screenshots/image-16.png)
 
+### Query the store
+
+After building the store, try the task shown below: embed a question, compare
+it with the stored vectors, and return the two most relevant articles. The
+task asks what to do when a user says, "I removed a file by mistake, can I get
+it back?" Compare your approach with the
+[`query_store.py`](./08-build-your-own-vector-store/query_store.py) example.
+
+![Query the store hands-on task](./08-build-your-own-vector-store/screenshots/image-17.png)
+
+### Quick check: your vector store
+
+Finish with the [vector-store quick check](./08-build-your-own-vector-store/screenshots/image-18.png):
+why must the query use the same embedding model as the documents in the store?
+The numbers from different embedding models are not directly comparable.
+
+![Vector store quick-check question](./08-build-your-own-vector-store/screenshots/image-18.png)
+
 Here is the SQLite storage step with three scheduling notes:
 
 ```python
@@ -253,3 +271,9 @@ This is similar to the ranking loop in [semantic search](#6-semantic-search),
 but candidate vectors are loaded from SQLite instead of recomputed. The
 question and stored documents must use the same embedding model; vectors from
 different models do not share a comparable coordinate space.
+
+
+```
+0.554 Deploys to production happen every Tuesday at 4pm.
+0.301 The staging environment resets nightly at midnight.
+```
