@@ -1,7 +1,9 @@
-import os
 import json
+from pathlib import Path
 
-with open("AI/02-RAG/data.txt", "r") as file:
+lesson_dir = Path(__file__).resolve().parent
+
+with (lesson_dir / "data.txt").open("r") as file:
     text = file.read()
 
 # print(text.split("\n\n"))
@@ -16,5 +18,5 @@ chunks = [p.strip() for p in text.split("\n\n") if p.strip()]
 #      print(f"--- chunk {i} ({len(chunk)} chars)")
 #      print(chunk)
 
-with open("AI/02-RAG/chunks.json", "w") as file:
+with (lesson_dir / "chunks.json").open("w") as file:
     json.dump(chunks, file, indent=4)
