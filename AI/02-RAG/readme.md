@@ -1,9 +1,9 @@
 # Retrieval-augmented generation (RAG)
 
-Follow these eight lessons in order to build a simple RAG workflow, from the
-problem it solves to storing and querying your own vectors. Lesson folders keep
-the supporting code, data, and screenshots together; this is the chapter's
-single README and learning path.
+Follow these nine lessons in order to build a simple RAG workflow, from the
+problem it solves to storing and querying your own vectors. Lesson folders
+keep the supporting code, data, and screenshots together; this is the
+chapter's single README and learning path.
 
 ## Learning path
 
@@ -17,14 +17,16 @@ single README and learning path.
 | 6 | [Semantic Search](#6-semantic-search) | [`rank-support-messages.py`](./06-semantic-search/rank-support-messages.py) |
 | 7 | [Chunking](#7-chunking) | [`create_chunk.py`](./07-chunking/create_chunk.py), [`data.txt`](./07-chunking/data.txt), [`chunks.json`](./07-chunking/chunks.json) |
 | 8 | [Build Your Own Vector Store](#8-build-your-own-vector-store) | [`create_store.py`](./08-build-your-own-vector-store/create_store.py), [`query_store.py`](./08-build-your-own-vector-store/query_store.py), [query task](#query-the-store), [quick check](#quick-check-your-vector-store) |
+| 9 | [Chroma: A Real Vector Database](#9-chroma-a-real-vector-database) | [`rough_notes.md`](./09-chroma-a-real-vector-database/rough_notes.md), [`add_chunks_chroma.py`](./09-chroma-a-real-vector-database/add_chunks_chroma.py), [`query_your_collection.py`](./09-chroma-a-real-vector-database/query_your_collection.py) |
 
 ## Before you start
 
-The examples use Python, the OpenAI Python SDK, and `python-dotenv`. From the
-repository root, install the packages and configure your API credentials:
+The examples use Python, the OpenAI Python SDK, `python-dotenv`, and Chroma.
+From the repository root, install the packages and configure your API
+credentials:
 
 ```bash
-python3 -m pip install openai python-dotenv
+python3 -m pip install openai python-dotenv chromadb
 export OPENAI_API_KEY="your-api-key"
 export OPENAI_BASE_URL="https://api.openai.com"
 ```
@@ -271,6 +273,72 @@ This is similar to the ranking loop in [semantic search](#6-semantic-search),
 but candidate vectors are loaded from SQLite instead of recomputed. The
 question and stored documents must use the same embedding model; vectors from
 different models do not share a comparable coordinate space.
+
+## 9. Chroma: A Real Vector Database
+
+The SQLite vector store in the previous lesson made the search process
+visible: load each vector, calculate its score, sort, then take the top
+results. A vector database such as Chroma stores documents and embeddings in
+a collection and provides nearest-neighbor search, so application code does
+not need to implement that scan-and-sort loop itself.
+
+![Why use a real vector database](./09-chroma-a-real-vector-database/screenshots/why-use-a-vector-database.png)
+
+In Chroma, a **collection** groups documents and their vectors. The
+`PersistentClient` keeps its database on disk, `get_or_create_collection()`
+opens or creates a collection, `add()` stores text with its embedding, and
+`query()` retrieves the nearest matches. This replaces the SQLite table and
+the manual cosine-scoring and sorting loop from Step 8.
+
+| What the SQLite example did | Chroma equivalent |
+| --- | --- |
+| Store text and its vector in a row | `collection.add(...)` |
+| Load every row, score, sort, and take the top two | `collection.query(..., n_results=2)` |
+
+The `add_chunks_chroma.py` script embeds the chunks created in
+[Step 7](#7-chunking) and writes them to the `handbook` collection. Chroma
+persists its local database in this lesson folder. The database files are
+local generated data and are excluded from Git.
+
+The essential collection operations look like this:
+
+```python
+collection = chroma.get_or_create_collection("handbook")
+collection.add(
+    ids=["chunk-0", "chunk-1"],
+    documents=chunks,
+    embeddings=vectors,
+)
+print("stored:", collection.count())
+```
+
+Each ID identifies one stored entry, and the `documents` and `embeddings`
+items must line up in the same order. The runnable chunk loader uses
+`upsert()` rather than `add()` so that running it again updates existing
+chunk IDs instead of failing on duplicates. See
+[`add_chunks_chroma.py`](./09-chroma-a-real-vector-database/add_chunks_chroma.py)
+for the complete example that reads and embeds the Step 7 chunks.
+
+From the repository root, build or update the collection, then query it:
+
+```bash
+python AI/02-RAG/09-chroma-a-real-vector-database/add_chunks_chroma.py
+python AI/02-RAG/09-chroma-a-real-vector-database/query_your_collection.py
+```
+
+The query script embeds the question with the same model used for the stored
+chunks and asks Chroma for the two closest results. Chroma returns documents
+and **distances**, not cosine-similarity scores. Query results are grouped by
+input query: `[0]` selects the results for the first question. With Chroma's
+default squared Euclidean (`l2`) distance, **smaller means closer**. This is
+why a result near zero can be a better match than one with a larger value. In
+contrast, when you calculate cosine similarity directly, higher values (near
+`1`) mean more similar. They are different metrics and their numbers should
+not be compared as if they were the same scale.
+
+![Adding chunks to Chroma](./09-chroma-a-real-vector-database/screenshots/add-chunks-to-chroma.png)
+
+![Query results and reading Chroma distances](./09-chroma-a-real-vector-database/screenshots/query-chroma-results.png)
 
 
 ```
