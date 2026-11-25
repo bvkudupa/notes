@@ -1,0 +1,22 @@
+Passwords must be changed on the first Monday of every quarter.
+Password managers approved by IT are listed on the intranet.
+
+Laptops are checked for disk encryption every 90 days. A failed
+check locks the laptop out of the VPN until IT clears it.
+
+Phones used for work email need a screen lock and remote wipe
+turned on. Personal apps are not restricted.
+
+USB drives are blocked on all finance machines. Other teams can
+request an exception through the helpdesk.
+
+Guest wifi access lasts 24 hours. New guest codes come from
+reception.
+
+Software installs on work machines go through the self-service
+portal. Anything not in the portal needs an IT ticket.
+
+Screens must lock automatically after 10 minutes of no activity.
+
+Security incidents are reported to security@company.example
+within one hour of discovery.

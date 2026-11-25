@@ -5,4 +5,8 @@ descriptively named screenshots, integrate the material into the chapter's
 single README located at the chapter root (beside the lesson folders), never
 inside a lesson folder, validate links and scripts, and clear each
 rough-notes file only after all of its content has been preserved. Ask only
-for essential missing topic details or screenshots.
+for essential missing topic details or screenshots. Preserve the user's
+readable, explicit coding style; do not rewrite their code into compact or
+advanced "Pythonic" forms merely for style. If an optional improvement is
+useful, show it separately below the original-style explanation/code, label
+it optional, and explain it simply.

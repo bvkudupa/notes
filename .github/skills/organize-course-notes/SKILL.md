@@ -36,16 +36,24 @@ material does not establish them.
    screenshots. Preserve technical meaning, correct inaccurate explanations
    when facts can be verified, and use relative links consistent with the
    chapter. Do not create a per-lesson README unless explicitly requested.
-6. Make moved scripts work from the documented command location and avoid
+6. Preserve the learner's coding style and level. Prefer clear, explicit
+   steps (such as named intermediate variables and ordinary `for` loops)
+   over compact or advanced idioms. Do not rewrite understandable code just
+   to make it more Pythonic, concise, or optimized. Make only changes needed
+   for correctness, portability, or the requested organization. If a
+   worthwhile optional improvement exists, leave the original-style code in
+   place and show the alternative separately below it, labeled as optional
+   and explained plainly; the learner should be able to ignore it.
+7. Make moved scripts work from the documented command location and avoid
    machine-specific absolute paths. Preserve existing behavior and unrelated
    work. Do not move, overwrite, or delete generated databases or other local
    data without checking their purpose and adding an appropriate ignore rule.
-7. Only after confirming that every useful point, asset, and code sample from
+8. Only after confirming that every useful point, asset, and code sample from
    the rough notes is represented in the README or its referenced lesson
    files, clear the contents of `rough_notes.md` while keeping the file as an
    empty staging file for the next session. Never clear notes containing
    unprocessed or omitted material.
-8. Validate README relative links, screenshot references, script syntax, and
+9. Validate README relative links, screenshot references, script syntax, and
    `git diff --check`. Run focused tests or example checks when applicable.
    Report what was organized, any verification, and any material left
    unprocessed.
@@ -55,6 +63,9 @@ material does not establish them.
 - Keep exactly one chapter README at the chapter root unless the user
   explicitly requests a different structure.
 - Make changes surgical and consistent with neighboring lessons.
+- Keep instructional code readable in the learner's existing style; do not
+  silently replace it with more advanced or compact idioms. Offer optional
+  alternatives separately, not as the default implementation.
 - Do not silently drop rough-note content; link or incorporate it.
 - Do not commit unless explicitly asked.
 - Use Markdown file links in the final response for workspace files.
