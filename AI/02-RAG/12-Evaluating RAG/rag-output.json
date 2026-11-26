@@ -1,0 +1,50 @@
+{
+  "results": [
+    {
+      "question": "How often do passwords have to change?",
+      "right_chunk": "chunk-0",
+      "returned_ids": [
+        "chunk-0",
+        "chunk-1"
+      ],
+      "hit": true
+    },
+    {
+      "question": "What happens if a laptop fails its encryption check?",
+      "right_chunk": "chunk-1",
+      "returned_ids": [
+        "chunk-1",
+        "chunk-3"
+      ],
+      "hit": true
+    },
+    {
+      "question": "Can I plug a USB stick into a finance computer?",
+      "right_chunk": "chunk-3",
+      "returned_ids": [
+        "chunk-3",
+        "chunk-5"
+      ],
+      "hit": true
+    },
+    {
+      "question": "How long does guest wifi last?",
+      "right_chunk": "chunk-4",
+      "returned_ids": [
+        "chunk-4",
+        "chunk-1"
+      ],
+      "hit": true
+    },
+    {
+      "question": "Where do I report a security incident?",
+      "right_chunk": "chunk-7",
+      "returned_ids": [
+        "chunk-7",
+        "chunk-0"
+      ],
+      "hit": true
+    }
+  ],
+  "hit_rate": 1.0
+}

@@ -1,6 +1,6 @@
 # Retrieval-augmented generation (RAG)
 
-Follow these eleven lessons in order to build a simple RAG workflow, from the
+Follow these twelve lessons in order to build a simple RAG workflow, from the
 problem it solves to a complete pipeline that retrieves evidence and
 generates a grounded answer. Lesson folders keep the supporting code, data,
 and screenshots together; this is the chapter's single README and learning
@@ -21,6 +21,7 @@ path.
 | 9 | [Chroma: A Real Vector Database](#9-chroma-a-real-vector-database) | [`add_chunks_chroma.py`](./09-chroma-a-real-vector-database/add_chunks_chroma.py), [`query_your_collection.py`](./09-chroma-a-real-vector-database/query_your_collection.py) |
 | 10 | [The Full RAG Pipeline](#10-the-full-rag-pipeline) | [`full-rag-pipeline.py`](<./10-The Full RAG pipeline/full-rag-pipeline.py>) |
 | 11 | [RAG on Chroma](#11-rag-on-chroma) | [`index.py`](<./11-RAG on Chroma/index.py>), [`answer.py`](<./11-RAG on Chroma/answer.py>), [`itpolicy.txt`](<./11-RAG on Chroma/itpolicy.txt>) |
+| 12 | [Evaluating RAG](#12-evaluating-rag) | [`evaluate-rag.py`](<./12-Evaluating RAG/evaluate-rag.py>), [`evaluate-scoring.py`](<./12-Evaluating RAG/evaluate-scoring.py>), [retrieval results](<./12-Evaluating RAG/rag-output.json>), [answer results](<./12-Evaluating RAG/answer-eval.json>) |
 
 ## Before you start
 
@@ -511,3 +512,147 @@ model should refuse to invent an answer because the prompt says to answer only
 from the retrieved documents.
 
 ![Quick check: RAG on Chroma](<./11-RAG on Chroma/screenshots/quick-check-rag-chroma.png>)
+
+## 12. Evaluating RAG
+
+A RAG system can fail in two different places: retrieval may return the wrong
+chunk, or the answer model may use the retrieved text incorrectly. Evaluate
+these separately so a low score points to the part that needs attention.
+
+An evaluation set is a small list of questions with known expected outcomes.
+Write questions the way a real user would ask them, not by copying the source
+sentence. For a retrieval test, include the ID of the chunk that contains the
+answer:
+
+```python
+eval_set = [
+    {
+        "question": "How often do we back up the database?",
+        "right_chunk": "chunk-1",
+        "must_contain": "2am",
+    },
+    {
+        "question": "When does new code reach production?",
+        "right_chunk": "chunk-0",
+        "must_contain": "Tuesday",
+    },
+    {
+        "question": "What is the first check when the site is down?",
+        "right_chunk": "chunk-2",
+        "must_contain": "load balancer",
+    },
+    {
+        "question": "Who takes over on-call duty, and when?",
+        "right_chunk": "chunk-3",
+        "must_contain": "Friday",
+    },
+]
+```
+
+These first examples use an operations collection to illustrate the fields.
+The runnable evaluation scripts use the `itpolicy` Chroma collection built in
+[Step 11](#11-rag-on-chroma). Its chunk IDs follow the paragraph order in the
+policy document. The test questions should be phrased independently from that
+document so retrieval has to match meaning rather than identical wording.
+
+### Measure retrieval hit rate
+
+For each question, embed it, retrieve the top two chunks, and check whether
+the expected chunk ID appears anywhere in those results. The **hit rate** is
+the number of questions where it appeared divided by the total number of
+questions. This checks membership in the top-k set; it does not require the
+right chunk to be ranked first.
+
+The essential check is whether the expected ID appears among the returned
+IDs:
+
+```python
+hit = test["right_chunk"] in returned_ids
+if hit:
+    hits += 1
+
+hit_rate = hits / len(eval_set)
+```
+
+The four-question operations example in the screenshot has a hit rate of
+`4/4 = 1.0`. A question string can be shortened and padded for aligned console
+columns; that formatting does not affect the score.
+
+[`evaluate-rag.py`](<./12-Evaluating RAG/evaluate-rag.py>) runs five IT policy
+questions, writes each question's expected and returned IDs plus its hit
+result to [`rag-output.json`](<./12-Evaluating RAG/rag-output.json>), and
+stores the overall `hit_rate`. For example, a hit rate of `1.0` means all
+expected chunks appeared in the top two for this small test set. It does not
+prove that every possible question will retrieve correctly.
+
+Run it from the repository root:
+
+```bash
+python "AI/02-RAG/12-Evaluating RAG/evaluate-rag.py"
+```
+
+![Why evaluate a RAG pipeline](<./12-Evaluating RAG/screenshots/why-evaluate-rag.png>)
+
+![An example top-k hit-rate result](<./12-Evaluating RAG/screenshots/retrieval-hit-rate-example.png>)
+
+The evaluation examples use three useful fields:
+
+- `question` is a realistic test query.
+- `right_chunk` is the known chunk ID that contains the answer, for grading
+  retrieval.
+- `must_contain` is a short, hard-to-avoid fact in a correct answer, for a
+  simple answer check.
+
+For readable console output, a format field can keep the result columns
+aligned:
+
+```python
+print(f"{test['question'][:45]:48} {'HIT' if hit else 'MISS'} {returned_ids}")
+```
+
+Here `[:45]` keeps at most the first 45 question characters, and `:48` pads
+that text to a 48-character field. It does not slice from character 45 to 48.
+
+The answer-scoring set also includes a question whose answer is absent from
+the source. It has no expected answer chunk and expects the refusal wording.
+This tests whether the full pipeline can decline to invent an answer, not only
+whether it can answer supported questions. The retrieval-only script scores
+the five answerable questions against known chunk IDs.
+
+![Evaluation-set design and a no-answer test](<./12-Evaluating RAG/screenshots/eval-question-design.png>)
+
+![The three evaluation fields](<./12-Evaluating RAG/screenshots/eval-set-fields.png>)
+
+![Retrieval evaluation task](<./12-Evaluating RAG/screenshots/retrieval-evaluation-task.png>)
+
+### Check generated answers
+
+[`evaluate-scoring.py`](<./12-Evaluating RAG/evaluate-scoring.py>) runs each
+test question through retrieval and the grounded answer prompt. It checks
+whether the expected `must_contain` text appears in the answer, without
+distinguishing uppercase from lowercase, then writes the answers, individual
+pass/fail results, and overall `accuracy` to
+[`answer-eval.json`](<./12-Evaluating RAG/answer-eval.json>).
+
+```bash
+python "AI/02-RAG/12-Evaluating RAG/evaluate-scoring.py"
+```
+
+![Answer evaluation result](<./12-Evaluating RAG/screenshots/answer-evaluation-example.png>)
+
+In the no-answer test, the expected phrase is `"not contain"` because the
+grounding prompt says, “The documents do not contain this information.” The
+prompt and test expectation need to agree: a correct refusal can otherwise
+be marked as a failure simply because the test is looking for different
+words. In the example run, correcting that mismatch raised the observed
+answer score from `0.8` to `1.0`.
+
+These scores are simple proxies, not proof that an answer is fully correct.
+A substring check can miss a valid paraphrase or pass an answer that includes
+the expected phrase alongside a false claim. Review the retrieved context and
+full answer when a test fails, and strengthen the checks for important use
+cases. A low retrieval hit rate points toward the questions, chunking, or
+embeddings; good retrieval with weak answers points toward the context,
+grounding prompt, or answer model.
+
+![Answer evaluation task](<./12-Evaluating RAG/screenshots/answer-evaluation-task.png>)

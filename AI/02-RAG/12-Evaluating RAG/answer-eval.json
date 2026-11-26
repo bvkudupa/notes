@@ -1,0 +1,35 @@
+{
+    "results": [
+        {
+            "question": "How often do passwords have to change?",
+            "must_contain": "Monday",
+            "answer": "Passwords must be changed on the first Monday of every quarter.",
+            "pass": "PASS"
+        },
+        {
+            "question": "How often are laptops checked for encryption?",
+            "must_contain": "90",
+            "answer": "Every 90 days.",
+            "pass": "PASS"
+        },
+        {
+            "question": "How long does guest wifi access last?",
+            "must_contain": "24",
+            "answer": "Guest wifi access lasts 24 hours.",
+            "pass": "PASS"
+        },
+        {
+            "question": "How fast must a security incident be reported?",
+            "must_contain": "hour",
+            "answer": "A security incident must be reported within one hour of discovery.",
+            "pass": "PASS"
+        },
+        {
+            "question": "How do I book a meeting room?",
+            "must_contain": "not contain",
+            "answer": "The documents do not contain this information.",
+            "pass": "PASS"
+        }
+    ],
+    "accuracy": 1.0
+}
