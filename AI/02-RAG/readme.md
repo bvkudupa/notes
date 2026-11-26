@@ -1,6 +1,6 @@
 # Retrieval-augmented generation (RAG)
 
-Follow these ten lessons in order to build a simple RAG workflow, from the
+Follow these eleven lessons in order to build a simple RAG workflow, from the
 problem it solves to a complete pipeline that retrieves evidence and
 generates a grounded answer. Lesson folders keep the supporting code, data,
 and screenshots together; this is the chapter's single README and learning
@@ -20,6 +20,7 @@ path.
 | 8 | [Build Your Own Vector Store](#8-build-your-own-vector-store) | [`create_store.py`](./08-build-your-own-vector-store/create_store.py), [`query_store.py`](./08-build-your-own-vector-store/query_store.py), [query task](#query-the-store), [quick check](#quick-check-your-vector-store) |
 | 9 | [Chroma: A Real Vector Database](#9-chroma-a-real-vector-database) | [`add_chunks_chroma.py`](./09-chroma-a-real-vector-database/add_chunks_chroma.py), [`query_your_collection.py`](./09-chroma-a-real-vector-database/query_your_collection.py) |
 | 10 | [The Full RAG Pipeline](#10-the-full-rag-pipeline) | [`full-rag-pipeline.py`](<./10-The Full RAG pipeline/full-rag-pipeline.py>) |
+| 11 | [RAG on Chroma](#11-rag-on-chroma) | [`index.py`](<./11-RAG on Chroma/index.py>), [`answer.py`](<./11-RAG on Chroma/answer.py>), [`itpolicy.txt`](<./11-RAG on Chroma/itpolicy.txt>) |
 
 ## Before you start
 
@@ -405,3 +406,108 @@ team-wiki evidence and the second says the document does not contain the
 requested information.
 
 ![A wrong retrieved chunk should lead to an honest refusal](<./10-The Full RAG pipeline/screenshots/wrong-chunk-honest-refusal.png>)
+
+## 11. RAG on Chroma
+
+This lesson combines the complete pipeline with a persistent Chroma database.
+The indexing step normally runs once: split the source text into chunks, embed
+those chunks, and store their documents and vectors in a collection. The
+answering step runs whenever a question is asked: embed the question, retrieve
+nearby chunks, and include that evidence in a grounded chat prompt.
+
+The runnable example uses [`itpolicy.txt`](<./11-RAG on Chroma/itpolicy.txt>)
+as its source. [`index.py`](<./11-RAG on Chroma/index.py>) reads the document,
+splits it at blank lines, embeds each paragraph, and saves the collection under
+its lesson folder. [`answer.py`](<./11-RAG on Chroma/answer.py>) opens the
+same collection, asks Chroma for the closest entries, joins them into an
+instructional context, and sends the context plus question to the chat model.
+
+From the repository root, index the document once:
+
+```bash
+python "AI/02-RAG/11-RAG on Chroma/index.py"
+```
+
+Then ask one or more questions. The collection remains on disk, so no indexing
+is needed for each separate question:
+
+```bash
+python "AI/02-RAG/11-RAG on Chroma/answer.py" "When do backups run and how long are they kept?"
+```
+
+The source text for this example contains the database-backup information used
+above: backups run nightly at 2am and are kept for 30 days.
+
+The core indexing operations are:
+
+```python
+chunks = []
+for paragraph in text.split("\n\n"):
+    chunks.append(paragraph.strip())
+
+response = client.embeddings.create(
+    model="text-embedding-3-small",
+    input=chunks,
+)
+
+chroma = chromadb.PersistentClient(path=lesson_dir/"ragchroma")
+collection = chroma.get_or_create_collection("itpolicy")
+collection.add(
+    ids=[f"chunk-{i}" for i in range(len(chunks))],
+    documents=chunks,
+    embeddings=[item.embedding for item in response.data],
+)
+```
+
+For answering, embed the question and request two relevant chunks:
+
+```python
+question = sys.argv[1]
+question_embedding = client.embeddings.create(
+    model="text-embedding-3-small",
+    input=question,
+).data[0].embedding
+
+results = collection.query(
+    query_embeddings=[question_embedding],
+    n_results=2,
+)
+top_chunks = results["documents"][0]
+```
+
+Chroma changes where documents are stored and how they are retrieved, but it
+does not change the grounding rule. The prompt tells the model to use only the
+retrieved documents and to say when the documents do not contain the answer.
+This matters because retrieval is not proof that the result is relevant: a
+nearest-neighbor search always returns available entries. The two retrieved
+chunks are joined together in `answer.py` because several answers may be
+spread across more than one document.
+
+![Chroma indexing result](<./11-RAG on Chroma/screenshots/chroma-index-result.png>)
+
+Swapping the in-memory pipeline for Chroma changes only storage and retrieval:
+
+- The index phase calls `collection.add(...)` or `collection.upsert(...)`
+  instead of rebuilding a Python list.
+- The retrieve phase calls `collection.query(...)` instead of scoring every
+  vector with a cosine-similarity loop.
+- The generate phase keeps the retrieved text and the explicit grounding
+  instruction unchanged.
+
+The same separation applies to top-k retrieval. `n_results=2` asks for two
+chunks rather than one. A two-chunk answer can catch information spread across
+multiple passages, but also introduces the risk of irrelevant context. For a
+larger, noisier collection, tune the number of retrieved chunks rather than
+removing the grounding instruction.
+
+![Swapping the in-memory pipeline for Chroma](<./11-RAG on Chroma/screenshots/swapping-store-explanation.png>)
+
+### Quick check
+
+Run the answer script with a question that is present in the source document.
+For example, the backup question should identify the nightly 2am schedule and
+30-day retention period. Then try a question that is not in the document. The
+model should refuse to invent an answer because the prompt says to answer only
+from the retrieved documents.
+
+![Quick check: RAG on Chroma](<./11-RAG on Chroma/screenshots/quick-check-rag-chroma.png>)

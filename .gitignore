@@ -2,3 +2,4 @@
 .venv
 AI/02-RAG/09-chroma-a-real-vector-database/chroma_db/
 AI/02-RAG/10-The Full RAG pipeline/outputs/
+AI/02-RAG/11-RAG on Chroma/ragchroma/
